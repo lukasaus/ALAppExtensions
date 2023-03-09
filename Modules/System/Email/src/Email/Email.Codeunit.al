@@ -559,7 +559,7 @@ codeunit 8901 "Email"
     /// <param name="EmailMessage">Email message codeunit which is linked to the current email.</param>
     //internal procedure OnBeforeSendEmail(var EmailMessage1: Codeunit "Email Message")
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeSendEmail(var EmailMessage: Codeunit "Email Message")
+    internal procedure OnBeforeSendEmail(var EmailMessage1: Codeunit "Email Message")
     begin
     end;
 
