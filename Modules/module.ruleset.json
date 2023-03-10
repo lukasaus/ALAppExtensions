@@ -370,6 +370,11 @@
           "id": "AS0110",
           "action": "None",
           "justification": "TODO: This rule is currently not implemented. Please enable it or add a justification."
+      },
+      {
+          "id": "AS0018 ",
+          "action": "Error",
+          "justification": "Testing"
       }
     ]
   }
