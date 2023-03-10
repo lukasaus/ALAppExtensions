@@ -533,6 +533,7 @@ codeunit 8901 "Email"
     internal procedure OnAfterEmailSent(SentEmail: Record "Sent Email")
     begin
     end;
+    
 #if not CLEAN21
     /// <summary>
     /// Integration event that notifies senders when the email has been sent unsuccessfully. This event is isolated.
@@ -543,7 +544,7 @@ codeunit 8901 "Email"
     begin
     end;
 #endif
-#if not CLEAN22
+
     /// <summary>
     /// Integration event that allows updating of the email message before the email editor opens.
     /// </summary>
@@ -553,13 +554,13 @@ codeunit 8901 "Email"
     internal procedure OnBeforeOpenEmailEditor(var EmailMessage: Codeunit "Email Message"; IsNewEmail: Boolean)
     begin
     end;
-#endif
+
     /// <summary>
     /// Integration event that allows updating of the email message before the email is queued for sending.
     /// </summary>
     /// <param name="EmailMessage">Email message codeunit which is linked to the current email.</param>
     [IntegrationEvent(false, false)]
-    internal procedure OnBeforeSendEmail(var EmailMessage1: Codeunit "Email Message")
+    internal procedure OnBeforeSendEmail(var EmailMessage: Codeunit "Email Message")
     begin
     end;
 
