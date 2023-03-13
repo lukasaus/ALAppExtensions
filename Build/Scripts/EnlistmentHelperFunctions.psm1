@@ -19,6 +19,7 @@ function Get-BuildMode() {
     return 'Default'
 }
 
+
 <#
 .Synopsis
     Get the value of a key from the BuildConfig.json or AL-GO-Settings file
@@ -44,6 +45,64 @@ function Get-ConfigValueFromKey() {
     $BuildConfig = Get-Content -Path $ConfigPath -Raw | ConvertFrom-Json
     return $BuildConfig.$Key
 }
+
+<#
+.Synopsis
+    Get the value of a key from the BuildConfig.json or AL-GO-Settings file
+.Parameter ConfigType
+    The type of config file to read from. Can be either "BuildConfig" or "AL-GO"
+.Parameter Key
+    The key to write to
+.Parameter Value
+    The value to set the key to
+#>
+function Set-ConfigValueFromKey() {
+    param(
+        [Parameter(Mandatory=$false)]
+        [ValidateSet("BuildConfig","AL-GO")]
+        [string]$ConfigType = "AL-GO",
+        [Parameter(Mandatory=$true)]
+        [string]$Key,
+        [Parameter(Mandatory=$true)]
+        [string]$Value
+    )
+
+    if ($ConfigType -eq "BuildConfig") {
+        $ConfigPath = Join-Path (Get-BaseFolder) "Build/BuildConfig.json" -Resolve
+    } else {
+        $ConfigPath = Join-Path (Get-BaseFolder) ".github/AL-Go-Settings.json" -Resolve
+    }
+    $BuildConfig = Get-Content -Path $ConfigPath -Raw | ConvertFrom-Json
+    $BuildConfig.$Key = $Value
+    $BuildConfig | ConvertTo-Json -Depth 100 | Set-Content -Path $ConfigPath
+}
+
+
+function Get-AutoSubmissionTopicBranchName()
+{
+    $currentDate = (Get-Date).ToUniversalTime().ToString("yyMMddHHmm")
+
+    return "private/$currentDate"
+}
+
+function New-AutoSubmissionTopicBranch
+{
+    [CmdletBinding(SupportsShouldProcess, ConfirmImpact='High')]
+    param
+    (
+        [Parameter(Mandatory=$true)]
+        [string] $BranchName
+    )
+    
+    $currentBranch = RunAndCheck git rev-parse --abbrev-ref HEAD
+    if(($currentBranch -ne $env:RepoBranchName) -and ((Get-NavGitParentBranch -LocalOnly) -ne $env:RepoBranchName))
+    {
+        throw "Current branch expected to be $($env:RepoBranchName) or its child. Actual branch is $currentBranch"
+    }
+
+    RunAndCheck git checkout -b $BranchName | Out-Null
+}
+
 
 <#
 .Synopsis

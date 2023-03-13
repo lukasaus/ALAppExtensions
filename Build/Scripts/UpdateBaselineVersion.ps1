@@ -4,6 +4,8 @@ Param(
     [Parameter(Mandatory = $true)]
     [string]$Repo = "AlAppExtensions",
     [Parameter(Mandatory = $true)]
+    [string]$TargetBranch = "main",
+    [Parameter(Mandatory = $true)]
     [string]$Token
 )
 
@@ -13,13 +15,21 @@ $latestBaseline = Get-LatestBaselineVersionFromArtifacts
 $currentBaseline = Get-ConfigValueFromKey -Key "baselineVersion" -ConfigType "BuildConfig" 
 
 if ([System.Version] $latestBaseline -gt [System.Version] $currentBaseline) {
-    Write-Host "Updating baseline version from $currentBaseline to $latestBaseline" -ForegroundColor Yellow
+    Write-Host "Updating baseline version from $currentBaseline to $latestBaseline" -ForegroundColor Green
+
+    Set-ConfigValueFromKey -Key "baselineVersion" -Value $latestBaseline -ConfigType "BuildConfig"
+
+    $currentDate = (Get-Date).ToUniversalTime().ToString("yyMMddHHmm")
+    $BranchName = "private/UpdateBaselineVersion-$latestBaseline-$currentDate"
+    git checkout -b $BranchName | Out-Null
+    git push --set-upstream origin $BranchName
+
+    New-GitHubPullRequest -Title "Update baseline version to $latestBaseline" -Head $BranchName -Base $TargetBranch  -Token $Token
+
+
 }
 
-$Title = "Update baseline version to $latestBaseline"
 
-$Head = ""
-$Base = ""
 
 # This function creates a pull request in Github with the current branch
 function New-GitHubPullRequest {
