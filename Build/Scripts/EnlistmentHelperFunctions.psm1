@@ -107,8 +107,11 @@ function New-AutoSubmissionTopicBranch
 <#
 .Synopsis
     Get the nuget.exe if it doesn't exist
+    Downloads the nuget.exe if it doesn't exist
+.Parameter OutputPath
+    The path where the nuget.exe will be downloaded to
 #>
-function Get-NugetExe() {
+function Restore-NugetExe() {
     param(
         [Parameter(Mandatory=$true)]
         [string]$OutputPath
@@ -146,7 +149,7 @@ function Get-PackageFromNuget() {
         [string]$OutputPath
     )
 
-    $NugetExePath = Get-NugetExe -OutputPath $OutputPath
+    $NugetExePath = Restore-NugetExe -OutputPath $OutputPath
 
     $NugetPackagePath = Join-Path $OutputPath "$PackageId.$Version"
     if (!(Test-Path $NugetPackagePath)) {
